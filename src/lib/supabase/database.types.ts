@@ -61,6 +61,12 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["admin_users"]["Insert"]>;
         Relationships: [];
       };
+      social_drafts: {
+        Row: { id:string; source_article_id:string|null; title:string; master_brief:string; tone_notes:string|null; facebook_copy:string|null; instagram_copy:string|null; linkedin_copy:string|null; threads_copy:string|null; short_copy:string|null; hashtags:string|null; seo_title:string|null; seo_description:string|null; status:"draft"|"generated"|"reviewed"|"ready"; generation_model:string|null; generation_metadata:Json; created_by:string|null; created_at:string; updated_at:string };
+        Insert: Partial<Database["public"]["Tables"]["social_drafts"]["Row"]> & {master_brief:string};
+        Update: Partial<Database["public"]["Tables"]["social_drafts"]["Insert"]>;
+        Relationships: [];
+      };
       orders: {
         Row: { id:string; order_number:string; confirmation_token_hash:string; customer_name:string; customer_email:string; customer_phone:string; shipping_address_line1:string; shipping_address_line2:string|null; shipping_postcode:string; shipping_city:string; shipping_state:string; shipping_country:"MY"; subtotal_cents:number; shipping_cents:number; total_cents:number; currency:"MYR"; order_status:"pending"|"processing"|"shipped"|"completed"|"cancelled"; payment_status:"unpaid"|"pending"|"paid"|"failed"|"refunded"; payment_provider:string|null; payment_reference:string|null; stock_decremented_at:string|null; customer_notes:string|null; admin_notes:string|null; created_at:string; updated_at:string; paid_at:string|null; shipped_at:string|null; completed_at:string|null; cancelled_at:string|null };
         Insert: Partial<Database["public"]["Tables"]["orders"]["Row"]> & { order_number:string; confirmation_token_hash:string; customer_name:string; customer_email:string; customer_phone:string; shipping_address_line1:string; shipping_postcode:string; shipping_city:string; shipping_state:string; subtotal_cents:number; shipping_cents:number; total_cents:number };
