@@ -1,0 +1,10 @@
+import test from"node:test";import assert from"node:assert/strict";import fs from"node:fs";
+const migration=fs.readFileSync(new URL("../supabase/migrations/202608210004_cart_checkout_orders.sql",import.meta.url),"utf8");
+const cart=fs.readFileSync(new URL("../src/components/cart/cart-provider.tsx",import.meta.url),"utf8"),status=fs.readFileSync(new URL("../src/lib/orders/status.ts",import.meta.url),"utf8"),payment=fs.readFileSync(new URL("../src/lib/payments/index.ts",import.meta.url),"utf8");
+test("money and shipping remain server-derived",()=>{assert.match(migration,/sum\(b\.price_cents \*/);assert.match(migration,/east_malaysia_cents/);assert.match(migration,/total_cents = subtotal_cents \+ shipping_cents/)});
+test("stock confirmation is one-time and guarded",()=>{assert.match(migration,/if v_order\.payment_status='paid' then return false/);assert.match(migration,/stock_quantity < oi\.quantity/);assert.match(migration,/stock_quantity=b\.stock_quantity-oi\.quantity/)});
+test("anonymous order access and mutation functions are revoked",()=>{assert.match(migration,/revoke all on public\.orders, public\.order_items from anon/);assert.match(migration,/revoke all on function public\.create_guest_order/);assert.match(migration,/grant execute .* to service_role/)});
+test("order and payment lifecycles are separate",()=>{assert.match(migration,/order_status in \('pending','processing','shipped','completed','cancelled'\)/);assert.match(migration,/payment_status in \('unpaid','pending','paid','failed','refunded'\)/)});
+test("cart persistence clamps quantities and supports removal",()=>{assert.match(cart,/localStorage\.setItem/);assert.match(cart,/Math\.min\(MAX/);assert.match(cart,/filter\(x=>x\.bookId!==bookId\)/)});
+test("fulfilment transitions are guarded",()=>{assert.match(status,/pending:\["processing","cancelled"\]/);assert.match(status,/shipped:\["completed"\]/);assert.match(status,/completed:\[\]/)});
+test("test payments cannot activate in production",()=>{assert.match(payment,/process\.env\.NODE_ENV!=="production"&&process\.env\.PAYMENT_MODE==="test"/)});

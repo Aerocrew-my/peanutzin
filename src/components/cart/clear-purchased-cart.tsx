@@ -1,0 +1,1 @@
+"use client";import{useEffect}from"react";import{useCart}from"./cart-provider";export function ClearPurchasedCart({paid}:{paid:boolean}){const{clear}=useCart();useEffect(()=>{if(paid)clear()},[paid,clear]);return null}

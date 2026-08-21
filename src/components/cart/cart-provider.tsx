@@ -1,0 +1,9 @@
+"use client";
+import { createContext,useContext,useEffect,useMemo,useState } from "react";
+import type { CartItem } from "@/types/commerce";
+const KEY="peanutzin-cart-v1",MAX=20;
+type Value={items:CartItem[];count:number;add:(bookId:string,slug:string)=>void;setQuantity:(bookId:string,n:number)=>void;remove:(bookId:string)=>void;clear:()=>void};
+const Context=createContext<Value|null>(null);
+function clean(value:unknown):CartItem[]{if(!Array.isArray(value))return[];return value.flatMap((x):CartItem[]=>{if(!x||typeof x!=="object")return[];const y=x as CartItem,q=Number(y.quantity);return typeof y.bookId==="string"&&typeof y.slug==="string"&&Number.isInteger(q)&&q>=1?[{bookId:y.bookId,slug:y.slug,quantity:Math.min(q,MAX)}]:[]}).slice(0,50)}
+export function CartProvider({children}:{children:React.ReactNode}){const[items,setItems]=useState<CartItem[]>([]),[ready,setReady]=useState(false);useEffect(()=>{const timer=setTimeout(()=>{try{setItems(clean(JSON.parse(localStorage.getItem(KEY)??"[]")))}catch{setItems([])}setReady(true)},0);return()=>clearTimeout(timer)},[]);useEffect(()=>{if(ready)localStorage.setItem(KEY,JSON.stringify(items))},[items,ready]);const value=useMemo<Value>(()=>({items,count:items.reduce((n,x)=>n+x.quantity,0),add:(bookId,slug)=>setItems(old=>old.some(x=>x.bookId===bookId)?old.map(x=>x.bookId===bookId?{...x,quantity:Math.min(MAX,x.quantity+1)}:x):[...old,{bookId,slug,quantity:1}]),setQuantity:(bookId,n)=>setItems(old=>old.map(x=>x.bookId===bookId?{...x,quantity:Math.max(1,Math.min(MAX,Math.trunc(n)||1))}:x)),remove:bookId=>setItems(old=>old.filter(x=>x.bookId!==bookId)),clear:()=>setItems([])}),[items]);return <Context.Provider value={value}>{children}</Context.Provider>}
+export function useCart(){const value=useContext(Context);if(!value)throw new Error("CartProvider missing");return value}

@@ -1,0 +1,9 @@
+export type OrderStatus = "pending" | "processing" | "shipped" | "completed" | "cancelled";
+export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed" | "refunded";
+export type CartItem = { bookId: string; slug: string; quantity: number };
+export type ShippingAddress = { line1: string; line2?: string; postcode: string; city: string; state: MalaysianState; country: "MY" };
+export type CheckoutInput = { customerName: string; customerEmail: string; customerPhone: string; shipping: ShippingAddress; customerNotes?: string; items: CartItem[] };
+export type OrderItem = { id: string; bookId: string | null; bookTitle: string; bookAuthor: string | null; bookSlug: string | null; unitPriceCents: number; quantity: number; lineTotalCents: number };
+export type Order = { id: string; orderNumber: string; orderStatus: OrderStatus; paymentStatus: PaymentStatus; subtotalCents: number; shippingCents: number; totalCents: number; currency: "MYR"; items: OrderItem[] };
+export const MALAYSIAN_STATES = ["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Penang","Perak","Perlis","Sabah","Sarawak","Selangor","Terengganu","Kuala Lumpur","Labuan","Putrajaya"] as const;
+export type MalaysianState = typeof MALAYSIAN_STATES[number];
