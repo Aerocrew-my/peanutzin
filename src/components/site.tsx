@@ -7,7 +7,8 @@ import { categoryLabel, navItems } from "@/data/mock-data";
 import { formatMoney } from "@/lib/format";
 
 export function Mark({ tone = "coral" }: { tone?: string }) {
-  return <span className={`art-mark art-${tone}`} aria-hidden="true"><i /><b /></span>;
+  const image = tone.startsWith("http");
+  return <span className={`art-mark ${image ? "art-image" : `art-${tone}`}`} style={image ? { backgroundImage: `url(${JSON.stringify(tone).slice(1,-1)})` } : undefined} aria-hidden="true">{!image && <><i /><b /></>}</span>;
 }
 
 export function ThemeToggle() {

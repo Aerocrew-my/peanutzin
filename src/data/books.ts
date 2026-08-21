@@ -3,9 +3,10 @@ import { books as fallbackBooks } from "./mock-data";
 import { shouldUseDevelopmentFallback, requireConfiguredDataSource } from "./shared";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
+import { publicMediaUrl } from "@/lib/supabase/media";
 
 type BookRow = Database["public"]["Tables"]["books"]["Row"];
-function mapBook(row: BookRow): Book { return { id: row.id, slug: row.slug, title: row.title, author: row.author, priceCents: row.price_cents, currency: row.currency, cover: row.cover_image_path ?? "coral", description: row.description ?? undefined, featured: row.featured, stockQuantity: row.stock_quantity }; }
+function mapBook(row: BookRow): Book { return { id: row.id, slug: row.slug, title: row.title, author: row.author, priceCents: row.price_cents, currency: row.currency, cover: publicMediaUrl("book-covers", row.cover_image_path) ?? "coral", description: row.description ?? undefined, featured: row.featured, stockQuantity: row.stock_quantity }; }
 async function queryBooks(query: (client: Awaited<ReturnType<typeof createClient>>) => PromiseLike<{ data: BookRow[] | null; error: { message: string } | null }>) {
   if (shouldUseDevelopmentFallback()) return fallbackBooks;
   requireConfiguredDataSource();

@@ -1,0 +1,1 @@
+import{AdminShell}from"@/components/admin/shell";import{ArticleEditor}from"@/components/admin/editors";export default function Page(){return <AdminShell section="Articles"><h1>New article</h1><ArticleEditor/></AdminShell>}

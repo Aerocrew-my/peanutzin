@@ -1,0 +1,1 @@
+import{AdminShell}from"@/components/admin/shell";export default function Page(){return <AdminShell section="Orders"><h1>Orders</h1><div className="admin-panel"><h2>Phase 4</h2><p>Order management will arrive with cart and checkout. No order data is collected yet.</p></div></AdminShell>}

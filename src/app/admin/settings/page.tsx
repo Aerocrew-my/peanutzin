@@ -1,0 +1,2 @@
+import{AdminShell,Notice}from"@/components/admin/shell";import{SettingsEditor}from"@/components/admin/editors";import{createClient}from"@/lib/supabase/server";
+export default async function Page({searchParams}:{searchParams:Promise<Record<string,string|undefined>>}){const q=await searchParams,{data}=await(await createClient()).from("site_settings").select("key,value");return <AdminShell section="Settings"><h1>Site settings</h1><Notice searchParams={q}/><SettingsEditor values={Object.fromEntries((data??[]).map(x=>[x.key,x.value]))}/></AdminShell>}

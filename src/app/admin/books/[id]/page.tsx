@@ -1,0 +1,2 @@
+import{notFound}from"next/navigation";import{AdminShell}from"@/components/admin/shell";import{BookEditor,DeleteForm,deleteBook}from"@/components/admin/editors";import{createClient}from"@/lib/supabase/server";
+export default async function Page({params}:{params:Promise<{id:string}>}){const{id}=await params;const{data}=await(await createClient()).from("books").select("*").eq("id",id).maybeSingle();if(!data)notFound();return <AdminShell section="Books"><h1>Edit book</h1><BookEditor book={data}/><DeleteForm action={deleteBook} id={id} label="book"/></AdminShell>}

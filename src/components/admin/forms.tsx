@@ -1,0 +1,11 @@
+"use client";
+import { useActionState, useState } from "react";
+import type { ActionState } from "@/app/admin/actions";
+
+export function ActionForm({ action, children, className="admin-form" }: { action:(state:ActionState,data:FormData)=>Promise<ActionState>; children:React.ReactNode; className?:string }) {
+  const [state, formAction, pending] = useActionState(action, {});
+  return <form action={formAction} className={className}>{state.error&&<p className="form-error" role="alert">{state.error}</p>}{children}<button className="button button-coral" disabled={pending}>{pending?"Saving…":"Save"}</button></form>;
+}
+export function SlugFields({title="",slug=""}:{title?:string;slug?:string}) { const [value,setValue]=useState(slug),[manual,setManual]=useState(Boolean(slug)); const normalize=(input:string)=>input.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); return <><label>Title<input name="title" required defaultValue={title} onChange={e=>{if(!manual)setValue(normalize(e.target.value));}}/></label><label>Slug<input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" value={value} onChange={e=>{setManual(true);setValue(normalize(e.target.value));}}/></label></>; }
+export function ArticleCategoryFields({category="news",start="",end="",location=""}:{category?:string;start?:string;end?:string;location?:string}) { const [value,setValue]=useState(category); return <><label>Category<select name="category" value={value} onChange={e=>setValue(e.target.value)}><option value="news">News</option><option value="gossip">Gossip</option><option value="event">Event</option><option value="feature">Feature</option></select></label>{value==="event"&&<><label>Event start<input name="event_start_at" type="datetime-local" defaultValue={start}/></label><label>Event end<input name="event_end_at" type="datetime-local" defaultValue={end}/></label><label>Event location<input name="event_location" defaultValue={location}/></label></>}</>; }
+export function DeleteForm({action,id,label}:{action:(data:FormData)=>Promise<void>;id:string;label:string}) { return <form action={action} onSubmit={e=>{if(!confirm(`Delete this ${label}? This cannot be undone.`))e.preventDefault();}}><input type="hidden" name="id" value={id}/><button className="button button-outline danger">Delete {label}</button></form>; }

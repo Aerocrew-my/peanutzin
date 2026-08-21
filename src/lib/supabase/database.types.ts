@@ -26,6 +26,7 @@ export type Database = {
         };
         Insert: Omit<Database["public"]["Tables"]["articles"]["Row"], "id" | "created_at" | "updated_at"> & { id?: string; created_at?: string; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["articles"]["Insert"]>;
+        Relationships: [];
       };
       books: {
         Row: {
@@ -46,11 +47,19 @@ export type Database = {
         };
         Insert: Omit<Database["public"]["Tables"]["books"]["Row"], "id" | "created_at" | "updated_at"> & { id?: string; created_at?: string; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["books"]["Insert"]>;
+        Relationships: [];
       };
       site_settings: {
         Row: { id: string; key: string; value: Json; updated_at: string };
         Insert: Omit<Database["public"]["Tables"]["site_settings"]["Row"], "id" | "updated_at"> & { id?: string; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["site_settings"]["Insert"]>;
+        Relationships: [];
+      };
+      admin_users: {
+        Row: { id: string; email: string | null; role: "admin" | "editor"; active: boolean; created_at: string; updated_at: string };
+        Insert: { id: string; email?: string | null; role?: "admin" | "editor"; active?: boolean; created_at?: string; updated_at?: string };
+        Update: Partial<Database["public"]["Tables"]["admin_users"]["Insert"]>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

@@ -1,0 +1,1 @@
+import{AdminShell}from"@/components/admin/shell";import{BookEditor}from"@/components/admin/editors";export default function Page(){return <AdminShell section="Books"><h1>New book</h1><BookEditor/></AdminShell>}
