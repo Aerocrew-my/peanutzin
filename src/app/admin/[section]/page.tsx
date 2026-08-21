@@ -1,0 +1,2 @@
+import { AdminPage } from "@/components/pages";
+export default async function AdminSection({ params }: { params: Promise<{ section: string }> }) { const section = (await params).section.split("-").map((word) => word[0].toUpperCase() + word.slice(1)).join(" "); return <AdminPage section={section} />; }

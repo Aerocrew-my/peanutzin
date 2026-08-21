@@ -1,0 +1,2 @@
+import { SimplePage } from "@/components/pages";
+export default function Contact() { return <SimplePage title="Come say hello" eyebrow="Contact" copy="Have a story, event or book we should know about? We would love to hear from you." />; }

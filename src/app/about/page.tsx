@@ -1,0 +1,2 @@
+import { SimplePage } from "@/components/pages";
+export default function About() { return <SimplePage title="Stories with a point of view" eyebrow="About PEANUTZIN" copy="Independent publishing and cultural media from Malaysia, made for curious people and generous communities." />; }
