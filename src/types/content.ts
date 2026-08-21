@@ -5,11 +5,15 @@ export interface Article {
   slug: string;
   title: string;
   excerpt: string;
+  body?: string;
   category: ArticleCategory;
   image: string;
   publishedAt: string;
   featured?: boolean;
   trendingRank?: number;
+  eventStartAt?: string;
+  eventEndAt?: string;
+  eventLocation?: string;
 }
 
 export interface Book {
@@ -17,8 +21,10 @@ export interface Book {
   slug: string;
   title: string;
   author: string;
-  price: number;
+  priceCents: number;
+  currency: "MYR";
   cover: string;
   description?: string;
   featured?: boolean;
+  stockQuantity?: number | null;
 }

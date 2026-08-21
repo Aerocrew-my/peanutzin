@@ -1,0 +1,27 @@
+insert into public.articles (slug, title, excerpt, body, category, status, featured, trending_rank, hero_image_path, published_at, event_start_at, event_end_at, event_location)
+values
+('klibf-returns-with-a-bigger-reading-party', 'KL International Book Fair returns with a bigger reading party', 'The annual celebration of stories, writers and curious readers is back in full colour.', 'The reading calendar is filling up again. This year''s fair brings publishers, booksellers and readers together for conversations that feel as lively as the books themselves.', 'event', 'published', true, 1, 'coral', '2026-08-21T09:00:00+08:00', '2026-09-26T10:00:00+08:00', '2026-10-04T20:00:00+08:00', 'Kuala Lumpur Convention Centre'),
+('booktok-malaysia-is-making-room-for-local-voices', 'BookTok Malaysia is making room for local voices', 'A new wave of reviewers is turning the page on what gets talked about online.', 'Across Malaysia, readers are making short videos that send local titles into new conversations. The most exciting part is how quickly those conversations become real-world recommendations.', 'gossip', 'published', false, 2, 'teal', '2026-08-19T09:00:00+08:00', null, null, null),
+('the-independent-publishers-changing-the-shelf', 'The independent publishers changing the shelf', 'Meet the small teams putting brave, beautiful books into Malaysian hands.', 'Independent publishers are building patient audiences around distinctive books. Their work is a reminder that a healthy shelf needs both familiar names and fresh points of view.', 'feature', 'published', true, 3, 'yellow', '2026-08-17T09:00:00+08:00', null, null, null),
+('five-ways-to-find-your-next-community', 'Five ways to find your next reading community', 'From quiet clubs to loud launches, there is a room for every kind of reader.', 'Start with one welcoming room. A library table, a bookshop launch or a group chat can all become the beginning of a reading habit shared with other people.', 'news', 'published', false, 4, 'blue', '2026-08-15T09:00:00+08:00', null, null, null),
+('what-authors-are-reading-this-month', 'What Malaysian authors are reading this month', 'We asked the people behind the pages to share their current favourites.', 'The answers ranged from slim poetry collections to long novels saved for a quiet weekend. The common thread was simple: good books make more room for good questions.', 'gossip', 'published', false, null, 'pink', '2026-08-12T09:00:00+08:00', null, null, null),
+('a-small-press-weekend-in-georgetown', 'A small press weekend is coming to George Town', 'Printers, illustrators and independent publishers are gathering for a weekend of paper and ideas.', 'A new community programme is bringing small presses together for workshops, conversations and a generous exchange of recommendations.', 'event', 'published', false, null, 'teal', '2026-08-10T09:00:00+08:00', '2026-09-12T11:00:00+08:00', '2026-09-13T18:00:00+08:00', 'George Town, Penang'),
+('why-reading-aloud-still-matters', 'Why reading aloud still matters', 'A shared voice can make even a familiar story feel new again.', 'Reading aloud is a small public act of attention. In homes, classrooms and community spaces, it keeps language social and invites people to listen together.', 'feature', 'published', false, null, 'coral', '2026-08-08T09:00:00+08:00', null, null, null)
+on conflict (slug) do update set title = excluded.title, excerpt = excluded.excerpt, body = excluded.body, category = excluded.category, status = excluded.status, featured = excluded.featured, trending_rank = excluded.trending_rank, hero_image_path = excluded.hero_image_path, published_at = excluded.published_at, event_start_at = excluded.event_start_at, event_end_at = excluded.event_end_at, event_location = excluded.event_location;
+
+insert into public.books (slug, title, author, description, price_cents, currency, cover_image_path, featured, active, stock_quantity)
+values
+('putera-cilik', 'Putera Cilik', 'A. Samad Said', 'A small story with a wonderfully large heart.', 3200, 'MYR', 'coral', true, true, 12),
+('laut-bercerita', 'Laut Bercerita', 'Leila S. Chudori', 'A moving novel about memory, friendship and the sea.', 5800, 'MYR', 'teal', true, true, 8),
+('memori-seorang-geisha', 'Memori Seorang Geisha', 'Arthur Golden', 'A sweeping story of a life shaped by art and resilience.', 4500, 'MYR', 'yellow', true, true, 6),
+('the-art-of-rest', 'The Art of Rest', 'Claudia Hammond', 'A thoughtful guide to making meaningful space for rest.', 4900, 'MYR', 'blue', false, true, 5),
+('the-reading-life', 'The Reading Life', 'PEANUTZIN Shelf Pick', 'A gentle companion for building a reading practice that lasts.', 3800, 'MYR', 'pink', false, true, 10)
+on conflict (slug) do update set title = excluded.title, author = excluded.author, description = excluded.description, price_cents = excluded.price_cents, currency = excluded.currency, cover_image_path = excluded.cover_image_path, featured = excluded.featured, active = excluded.active, stock_quantity = excluded.stock_quantity;
+
+insert into public.site_settings (key, value) values
+('announcement', to_jsonb('KL International Book Fair 2026 · Hall 4, Booth 123'::text)),
+('newsletterHeading', to_jsonb('Let''s stay in touch!'::text)),
+('newsletterCopy', to_jsonb('Get the latest stories, events and book recommendations straight to your inbox.'::text)),
+('contact', '{"email":"hello@peanutzin.my"}'::jsonb),
+('social', '{"instagram":"peanutzin","tiktok":"peanutzin"}'::jsonb)
+on conflict (key) do update set value = excluded.value;

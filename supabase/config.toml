@@ -1,0 +1,4 @@
+project_id = "kdyquipcyynugdyagecr"
+
+[db]
+seed = "./seed.sql"

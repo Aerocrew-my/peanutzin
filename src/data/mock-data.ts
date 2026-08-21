@@ -9,10 +9,10 @@ export const articles: Article[] = [
 ];
 
 export const books: Book[] = [
-  { id: "b1", slug: "putera-cilik", title: "Putera Cilik", author: "A. Samad Said", price: 32, cover: "coral", featured: true, description: "A small story with a wonderfully large heart." },
-  { id: "b2", slug: "laut-bercerita", title: "Laut Bercerita", author: "Leila S. Chudori", price: 58, cover: "teal", featured: true, description: "A moving novel about memory, friendship and the sea." },
-  { id: "b3", slug: "memori-seorang-geisha", title: "Memori Seorang Geisha", author: "Arthur Golden", price: 45, cover: "yellow", featured: true, description: "A sweeping story of a life shaped by art and resilience." },
-  { id: "b4", slug: "the-art-of-rest", title: "The Art of Rest", author: "Claudia Hammond", price: 49, cover: "blue" },
+  { id: "b1", slug: "putera-cilik", title: "Putera Cilik", author: "A. Samad Said", priceCents: 3200, currency: "MYR", cover: "coral", featured: true, description: "A small story with a wonderfully large heart." },
+  { id: "b2", slug: "laut-bercerita", title: "Laut Bercerita", author: "Leila S. Chudori", priceCents: 5800, currency: "MYR", cover: "teal", featured: true, description: "A moving novel about memory, friendship and the sea." },
+  { id: "b3", slug: "memori-seorang-geisha", title: "Memori Seorang Geisha", author: "Arthur Golden", priceCents: 4500, currency: "MYR", cover: "yellow", featured: true, description: "A sweeping story of a life shaped by art and resilience." },
+  { id: "b4", slug: "the-art-of-rest", title: "The Art of Rest", author: "Claudia Hammond", priceCents: 4900, currency: "MYR", cover: "blue" },
 ];
 
 export const navItems = [

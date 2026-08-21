@@ -1,2 +1,4 @@
 import { BooksPage } from "@/components/pages";
-export default function Books() { return <BooksPage />; }
+import { getActiveBooks } from "@/data/books";
+export const dynamic = "force-dynamic";
+export default async function Books() { return <BooksPage books={await getActiveBooks()} />; }
