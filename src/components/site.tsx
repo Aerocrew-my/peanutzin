@@ -7,9 +7,9 @@ import { categoryLabel, navItems } from "@/data/mock-data";
 import { formatMoney } from "@/lib/format";
 import { useCart } from "@/components/cart/cart-provider";
 
-export function Mark({ tone = "coral" }: { tone?: string }) {
+export function Mark({ tone = "coral", alt }: { tone?: string; alt?: string }) {
   const image = tone.startsWith("http");
-  return <span className={`art-mark ${image ? "art-image" : `art-${tone}`}`} style={image ? { backgroundImage: `url(${JSON.stringify(tone).slice(1,-1)})` } : undefined} aria-hidden="true">{!image && <><i /><b /></>}</span>;
+  return <span className={`art-mark ${image ? "art-image" : `art-${tone}`}`} style={image ? { backgroundImage: `url(${JSON.stringify(tone).slice(1,-1)})` } : undefined} role={image&&alt?"img":undefined} aria-label={image?alt:undefined} aria-hidden={image&&alt?undefined:true}>{!image && <><i /><b /></>}</span>;
 }
 
 export function ThemeToggle() {
@@ -45,7 +45,7 @@ export function Header({ articles = [], books = [], announcement = "KL Internati
 }
 
 export function ArticleCard({ article, lead = false }: { article: Article; lead?: boolean }) {
-  return <Link className={`article-card ${lead ? "lead" : ""}`} href={`/stories/${article.slug}`}><Mark tone={article.image} /><div className="card-copy"><span className="eyebrow">{categoryLabel[article.category]}</span><h3>{article.title}</h3><p>{article.excerpt}</p><time>{article.publishedAt}</time></div></Link>;
+  return <Link className={`article-card ${lead ? "lead" : ""}`} href={`/stories/${article.slug}`}><Mark tone={article.image} alt={article.imageAlt} /><div className="card-copy"><span className="eyebrow">{categoryLabel[article.category]}</span><h3>{article.title}</h3><p>{article.excerpt}</p><time>{article.publishedAt}</time></div></Link>;
 }
 
 export function Newsletter() {

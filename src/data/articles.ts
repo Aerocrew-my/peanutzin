@@ -10,7 +10,7 @@ type ArticleRow = Database["public"]["Tables"]["articles"]["Row"];
 function mapArticle(row: ArticleRow): Article {
   return {
     id: row.id, slug: row.slug, title: row.title, excerpt: row.excerpt ?? "",
-    body: row.body ?? undefined, category: row.category, image: publicMediaUrl("article-media", row.hero_image_path) ?? "coral",
+    body: row.body ?? undefined, category: row.category, image: publicMediaUrl("article-media", row.hero_image_path) ?? "coral", imageAlt: row.hero_image_alt ?? undefined,
     publishedAt: row.published_at ? new Intl.DateTimeFormat("en-MY", { day: "numeric", month: "short", year: "numeric" }).format(new Date(row.published_at)) : "",
     featured: row.featured, trendingRank: row.trending_rank ?? undefined,
     eventStartAt: row.event_start_at ?? undefined, eventEndAt: row.event_end_at ?? undefined,

@@ -15,6 +15,7 @@ export type Database = {
           featured: boolean;
           trending_rank: number | null;
           hero_image_path: string | null;
+          hero_image_alt: string | null;
           published_at: string | null;
           event_start_at: string | null;
           event_end_at: string | null;
@@ -27,7 +28,7 @@ export type Database = {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["articles"]["Row"], "id" | "created_at" | "updated_at"> & { id?: string; created_at?: string; updated_at?: string };
+        Insert: Omit<Database["public"]["Tables"]["articles"]["Row"], "id" | "created_at" | "updated_at" | "hero_image_alt"> & { id?: string; created_at?: string; updated_at?: string; hero_image_alt?: string | null };
         Update: Partial<Database["public"]["Tables"]["articles"]["Insert"]>;
         Relationships: [];
       };
@@ -68,6 +69,12 @@ export type Database = {
         Row: { id:string; source_article_id:string|null; title:string; master_brief:string; tone_notes:string|null; facebook_copy:string|null; instagram_copy:string|null; linkedin_copy:string|null; threads_copy:string|null; short_copy:string|null; hashtags:string|null; seo_title:string|null; seo_description:string|null; status:"draft"|"generated"|"reviewed"|"ready"; generation_model:string|null; generation_metadata:Json; created_by:string|null; created_at:string; updated_at:string };
         Insert: Partial<Database["public"]["Tables"]["social_drafts"]["Row"]> & {master_brief:string};
         Update: Partial<Database["public"]["Tables"]["social_drafts"]["Insert"]>;
+        Relationships: [];
+      };
+      social_publications: {
+        Row: { id:string; social_draft_id:string; platform:"facebook"|"instagram"|"linkedin"|"threads"; status:"pending"|"sent"|"published"|"failed"|"manual"; method:"make"|"manual"; attempt_reference:string; external_reference:string|null; error_message:string|null; published_at:string|null; created_by:string|null; created_at:string; updated_at:string };
+        Insert: Omit<Database["public"]["Tables"]["social_publications"]["Row"],"id"|"created_at"|"updated_at"> & {id?:string;created_at?:string;updated_at?:string};
+        Update: Partial<Database["public"]["Tables"]["social_publications"]["Insert"]>;
         Relationships: [];
       };
       orders: {

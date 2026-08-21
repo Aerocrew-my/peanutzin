@@ -8,6 +8,7 @@ export interface Article {
   body?: string;
   category: ArticleCategory;
   image: string;
+  imageAlt?: string;
   publishedAt: string;
   featured?: boolean;
   trendingRank?: number;
