@@ -19,6 +19,9 @@ export type Database = {
           event_start_at: string | null;
           event_end_at: string | null;
           event_location: string | null;
+          source_name: string | null;
+          source_url: string | null;
+          event_url: string | null;
           seo_title: string | null;
           seo_description: string | null;
           created_at: string;

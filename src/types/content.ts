@@ -14,6 +14,9 @@ export interface Article {
   eventStartAt?: string;
   eventEndAt?: string;
   eventLocation?: string;
+  sourceName?: string;
+  sourceUrl?: string;
+  eventUrl?: string;
 }
 
 export interface Book {
