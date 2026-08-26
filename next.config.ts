@@ -1,13 +1,23 @@
 import type { NextConfig } from "next";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://kdyquipcyynugdyagecr.supabase.co";
-const supabaseStorage = new URL("/storage/v1/object/public/**", supabaseUrl);
+function supabaseStoragePattern(): URL[] {
+  const configured = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (!configured) return [];
+
+  try {
+    const base = new URL(configured);
+    if (base.protocol !== "https:") return [];
+    return [new URL("/storage/v1/object/public/**", base)];
+  } catch {
+    return [];
+  }
+}
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: { serverActions: { bodySizeLimit: "6mb" } },
   images: {
-    remotePatterns: [supabaseStorage],
+    remotePatterns: supabaseStoragePattern(),
   },
 };
 
