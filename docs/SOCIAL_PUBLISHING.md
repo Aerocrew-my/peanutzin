@@ -1,5 +1,7 @@
 # Social Publishing
 
+Status: Social Studio **READY**; Make.com publishing **READY FOR CONFIGURATION**; live social accounts **NOT CONFIGURED**.
+
 Social Studio keeps human review as the publication boundary. A saved draft must have `status = ready`; server actions re-read that status and platform-specific copy before doing any work.
 
 ## Architecture
@@ -36,3 +38,9 @@ For Facebook, Instagram, LinkedIn, and Threads, administrators can copy the capt
 4. Return a signed callback only after the platform confirms publication.
 
 No analytics, scheduling, inbox, background auto-publishing, platform tokens, or secrets are exposed to the browser.
+
+## Make.com handover requirements
+
+Make.com must receive the PEANUTZIN payload, validate/authenticate the expected request where supported, route only to selected platforms, preserve the downstream post ID or stable URL, and classify failures accurately. It must callback with `publication_id`, `attempt_reference`, `status` (`published` or `failed`), and optional `external_reference`/`error_message`. Use `external_reference` for the platform post ID or, where more useful and supported, its stable URL.
+
+Duplicate or stale callbacks conflict because only the matching `sent` attempt can change. A retry creates a new attempt reference. Facebook, Instagram, LinkedIn and Threads credentials belong in Make.com—not PEANUTZIN environment files or Git. Test one reviewed post per intended platform before launch.
