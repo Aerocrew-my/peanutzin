@@ -1,38 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import type { Article, Book } from "@/types/content";
 import { categoryLabel, navItems } from "@/data/mock-data";
 import { formatMoney } from "@/lib/format";
 import { useCart } from "@/components/cart/cart-provider";
 
-export function Mark({ tone = "coral", alt }: { tone?: string; alt?: string }) {
+export function Mark({ tone = "coral", alt = "", sizes = "(max-width: 700px) 100vw, 33vw" }: { tone?: string; alt?: string; sizes?: string }) {
   const image = tone.startsWith("http");
-  return <span className={`art-mark ${image ? "art-image" : `art-${tone}`}`} style={image ? { backgroundImage: `url(${JSON.stringify(tone).slice(1,-1)})` } : undefined} role={image&&alt?"img":undefined} aria-label={image?alt:undefined} aria-hidden={image&&alt?undefined:true}>{!image && <><i /><b /></>}</span>;
+  return <span className={`art-mark ${image ? "art-image" : `art-${tone}`}`} aria-hidden={!image || !alt}>{image ? <Image src={tone} alt={alt} fill sizes={sizes} /> : <><i /><b /></>}</span>;
 }
 
 export function ThemeToggle() {
-  const [dark, setDark] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem("peanutzin-theme");
     const next = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.dataset.theme = next ? "dark" : "light";
   }, []);
   function toggle() {
-    const next = !dark;
-    setDark(next);
+    const next = document.documentElement.dataset.theme !== "dark";
     document.documentElement.dataset.theme = next ? "dark" : "light";
     localStorage.setItem("peanutzin-theme", next ? "dark" : "light");
   }
-  return <button className="icon-button" onClick={toggle} aria-label={`Switch to ${dark ? "light" : "dark"} theme`}>{dark ? "sun" : "moon"}</button>;
+  return <button className="icon-button" onClick={toggle} aria-label="Toggle colour theme">theme</button>;
 }
 
 export function SearchBox({ open, onClose, articles, books }: { open: boolean; onClose: () => void; articles: Article[]; books: Book[] }) {
   const [query, setQuery] = useState("");
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (!open) return; const previous = document.activeElement as HTMLElement | null; const keydown = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); }; document.addEventListener("keydown", keydown); closeRef.current?.focus(); return () => { document.removeEventListener("keydown", keydown); previous?.focus(); }; }, [open, onClose]);
   const results = [...articles, ...books].filter((item) => item.title.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
   if (!open) return null;
-  return <div className="search-layer" role="dialog" aria-modal="true" aria-label="Search PEANUTZIN"><div className="search-box"><button className="close-button" onClick={onClose} aria-label="Close search">close</button><p className="eyebrow">Find a good read</p><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search stories and books" />{query && <div className="search-results">{results.length ? results.map((item) => <Link key={item.id} href={"author" in item ? `/books/${item.slug}` : `/stories/${item.slug}`} onClick={onClose}>{item.title}<span>{"author" in item ? item.author : categoryLabel[item.category]}</span></Link>) : <p>No matches yet. Try another word.</p>}</div>}</div></div>;
+  return <div className="search-layer" role="dialog" aria-modal="true" aria-labelledby="search-title"><div className="search-box"><button ref={closeRef} className="close-button" onClick={onClose} aria-label="Close search">close</button><p className="eyebrow" id="search-title">Find a good read</p><label className="sr-only" htmlFor="site-search">Search stories and books</label><input id="site-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search stories and books" />{query && <div className="search-results" aria-live="polite">{results.length ? results.map((item) => <Link key={item.id} href={"author" in item ? `/books/${item.slug}` : `/stories/${item.slug}`} onClick={onClose}>{item.title}<span>{"author" in item ? item.author : categoryLabel[item.category]}</span></Link>) : <p>No matches yet. Try another word.</p>}</div>}</div></div>;
 }
 
 export function Header({ articles = [], books = [], announcement = "KL International Book Fair 2026 · Hall 4, Booth 123" }: { articles?: Article[]; books?: Book[]; announcement?: string }) {
@@ -45,7 +46,7 @@ export function Header({ articles = [], books = [], announcement = "KL Internati
 }
 
 export function ArticleCard({ article, lead = false }: { article: Article; lead?: boolean }) {
-  return <Link className={`article-card ${lead ? "lead" : ""}`} href={`/stories/${article.slug}`}><Mark tone={article.image} alt={article.imageAlt} /><div className="card-copy"><span className="eyebrow">{categoryLabel[article.category]}</span><h3>{article.title}</h3><p>{article.excerpt}</p><time>{article.publishedAt}</time></div></Link>;
+  return <Link className={`article-card ${lead ? "lead" : ""}`} href={`/stories/${article.slug}`}><Mark tone={article.image} alt={article.imageAlt ?? article.title} sizes={lead ? "(max-width: 700px) 100vw, 46vw" : "(max-width: 700px) 100vw, 28vw"} /><div className="card-copy"><span className="eyebrow">{categoryLabel[article.category]}</span><h3>{article.title}</h3><p>{article.excerpt}</p><time dateTime={article.publishedAtIso}>{article.publishedAt}</time></div></Link>;
 }
 
 export function Newsletter() {

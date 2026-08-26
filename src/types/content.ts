@@ -10,6 +10,8 @@ export interface Article {
   image: string;
   imageAlt?: string;
   publishedAt: string;
+  publishedAtIso?: string;
+  modifiedAtIso?: string;
   featured?: boolean;
   trendingRank?: number;
   eventStartAt?: string;

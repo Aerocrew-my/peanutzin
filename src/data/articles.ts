@@ -4,6 +4,7 @@ import { shouldUseDevelopmentFallback, requireConfiguredDataSource } from "./sha
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { publicMediaUrl } from "@/lib/supabase/media";
+import { cache } from "react";
 
 type ArticleRow = Database["public"]["Tables"]["articles"]["Row"];
 
@@ -12,6 +13,7 @@ function mapArticle(row: ArticleRow): Article {
     id: row.id, slug: row.slug, title: row.title, excerpt: row.excerpt ?? "",
     body: row.body ?? undefined, category: row.category, image: publicMediaUrl("article-media", row.hero_image_path) ?? "coral", imageAlt: row.hero_image_alt ?? undefined,
     publishedAt: row.published_at ? new Intl.DateTimeFormat("en-MY", { day: "numeric", month: "short", year: "numeric" }).format(new Date(row.published_at)) : "",
+    publishedAtIso: row.published_at ?? undefined, modifiedAtIso: row.updated_at ?? undefined,
     featured: row.featured, trendingRank: row.trending_rank ?? undefined,
     eventStartAt: row.event_start_at ?? undefined, eventEndAt: row.event_end_at ?? undefined,
     eventLocation: row.event_location ?? undefined,
@@ -53,10 +55,10 @@ export function getFeaturedArticles() {
   return queryArticles((client) => client.from("articles").select("*").eq("status", "published").eq("featured", true).order("published_at", { ascending: false }));
 }
 
-export async function getArticleBySlug(slug: string) {
+export const getArticleBySlug = cache(async function getArticleBySlug(slug: string) {
   if (shouldUseDevelopmentFallback()) return fallbackArticles.find((article) => article.slug === slug) ?? null;
   requireConfiguredDataSource();
   const { data, error } = await (await createClient()).from("articles").select("*").eq("status", "published").eq("slug", slug).maybeSingle();
   if (error) throw new Error(`Unable to load article: ${error.message}`);
   return data ? mapArticle(data) : null;
-}
+});
