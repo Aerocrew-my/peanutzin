@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./phase10.css";
+import "./phase10-navigation.css";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { DEFAULT_DESCRIPTION, SITE_URL } from "@/lib/seo";
 

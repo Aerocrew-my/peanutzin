@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./phase10.css";
 :root { --canvas:#fffaf2; --surface:#fff; --ink:#17243b; --muted:#687183; --line:#d9d8d1; --coral:#ee5c4b; --teal:#18a8a0; --yellow:#f5c84b; --blue:#6f9fe5; --pink:#ed9db0; --footer:#123f4a; --shadow:#17243b18; }
 :root[data-theme="dark"] { --canvas:#101c2d; --surface:#19283b; --ink:#f8f4e9; --muted:#b5bfca; --line:#34465a; --footer:#0b303b; --shadow:#0004; }
 * { box-sizing:border-box; } html { max-width:100%; background:var(--canvas); scroll-behavior:smooth; overflow-x:hidden; } body { max-width:100%; margin:0; background:var(--canvas); color:var(--ink); font-family:Georgia,"Times New Roman",serif; overflow-x:hidden; } a { color:inherit; text-decoration:none; } button,input,select,textarea { font:inherit; } button { cursor:pointer; } button:disabled { cursor:not-allowed; opacity:.62; } :focus-visible { outline:3px solid var(--yellow); outline-offset:3px; }
