@@ -55,12 +55,13 @@ export async function saveArticle(_state: ActionState, form: FormData): Promise<
   if (start && end && new Date(end) < new Date(start)) return { error: "Event end must follow its start." };
   try {
     const newImage = await upload(form, "image", "article-media", `articles/${slug}`);
-    const values = { title, slug, category: category as "news"|"gossip"|"event"|"feature", status: status as "draft"|"published", excerpt: nullable(form,"excerpt"), body: nullable(form,"body"), hero_image_path: newImage ?? nullable(form,"existing_image"), hero_image_alt: nullable(form,"hero_image_alt"), featured: form.get("featured") === "on", trending_rank: rank, published_at: published ?? null, event_start_at: category === "event" ? start ?? null : null, event_end_at: category === "event" ? end ?? null : null, event_location: category === "event" ? nullable(form,"event_location") : null, event_url: category === "event" ? nullable(form,"event_url") : null, source_name: nullable(form,"source_name"), source_url: nullable(form,"source_url"), seo_title: nullable(form,"seo_title"), seo_description: nullable(form,"seo_description") };
+    const removeImage = form.get("remove_image") === "on";
+    const values = { title, slug, category: category as "news"|"gossip"|"event"|"feature", status: status as "draft"|"published", excerpt: nullable(form,"excerpt"), body: nullable(form,"body"), hero_image_path: newImage ?? (removeImage ? null : nullable(form,"existing_image")), hero_image_alt: nullable(form,"hero_image_alt"), featured: form.get("featured") === "on", trending_rank: rank, published_at: published ?? null, event_start_at: category === "event" ? start ?? null : null, event_end_at: category === "event" ? end ?? null : null, event_location: category === "event" ? nullable(form,"event_location") : null, event_url: category === "event" ? nullable(form,"event_url") : null, source_name: nullable(form,"source_name"), source_url: nullable(form,"source_url"), seo_title: nullable(form,"seo_title"), seo_description: nullable(form,"seo_description") };
     const supabase = await createClient();
     const result = id ? await supabase.from("articles").update(values).eq("id", id).select("id").single() : await supabase.from("articles").insert(values).select("id").single();
     if (result.error) return { error: friendly(result.error.message) };
     const oldImage = nullable(form, "existing_image");
-    if (newImage && oldImage?.includes("/")) await supabase.storage.from("article-media").remove([oldImage]);
+    if ((newImage || removeImage) && oldImage?.includes("/")) await supabase.storage.from("article-media").remove([oldImage]);
   } catch (error) { return { error: error instanceof Error ? error.message : "Unable to save article." }; }
   revalidateTag("articles", "max"); revalidatePath("/", "layout"); redirect(`/admin/articles?saved=${status}`);
 }
@@ -81,12 +82,13 @@ export async function saveBook(_state: ActionState, form: FormData): Promise<Act
     const newImage = await upload(form,"image","book-covers",`books/${slug}`);
     const catalogueType=text(form,"catalogue_type") as "peanutzin"|"indie_author"|"independent_publisher";
     if(!["peanutzin","indie_author","independent_publisher"].includes(catalogueType))return{error:"Choose a catalogue type."};
-    const values = { title, author, slug, description: nullable(form,"description"), price_cents: Math.round(Number(price) * 100), currency: "MYR" as const, cover_image_path: newImage ?? nullable(form,"existing_image"), featured: form.get("featured") === "on", active: form.get("active") === "on", stock_quantity: format==="ebook"?null:stock, isbn: nullable(form,"isbn"),publisher:nullable(form,"publisher"),publication_year:year,language:nullable(form,"language"),genre:nullable(form,"genre"),format:format as "physical"|"ebook"|"both",ebook_price_cents:format==="physical"?null:Math.round(Number(ebookPrice)*100),catalogue_type:catalogueType,independent_publisher:form.get("independent_publisher")==="on",emerging_author:form.get("emerging_author")==="on",preview_only:form.get("preview_only")==="on" };
+    const removeImage = form.get("remove_image") === "on";
+    const values = { title, author, slug, description: nullable(form,"description"), price_cents: Math.round(Number(price) * 100), currency: "MYR" as const, cover_image_path: newImage ?? (removeImage ? null : nullable(form,"existing_image")), featured: form.get("featured") === "on", active: form.get("active") === "on", stock_quantity: format==="ebook"?null:stock, isbn: nullable(form,"isbn"),publisher:nullable(form,"publisher"),publication_year:year,language:nullable(form,"language"),genre:nullable(form,"genre"),format:format as "physical"|"ebook"|"both",ebook_price_cents:format==="physical"?null:Math.round(Number(ebookPrice)*100),catalogue_type:catalogueType,independent_publisher:form.get("independent_publisher")==="on",emerging_author:form.get("emerging_author")==="on",preview_only:form.get("preview_only")==="on" };
     const supabase = await createClient();
     const result = id ? await supabase.from("books").update(values).eq("id",id).select("id").single() : await supabase.from("books").insert(values).select("id").single();
     if (result.error) return { error: friendly(result.error.message) };
     const oldImage = nullable(form, "existing_image");
-    if (newImage && oldImage?.includes("/")) await supabase.storage.from("book-covers").remove([oldImage]);
+    if ((newImage || removeImage) && oldImage?.includes("/")) await supabase.storage.from("book-covers").remove([oldImage]);
   } catch (error) { return { error: error instanceof Error ? error.message : "Unable to save book." }; }
   revalidateTag("books", "max"); revalidatePath("/", "layout"); redirect("/admin/books?saved=1");
 }

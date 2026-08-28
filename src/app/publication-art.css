@@ -1,0 +1,3 @@
+.book-card .art-image img { object-fit: contain; }
+.book-card:has(.art-image) .art-mark { background: transparent; }
+[data-theme="dark"] .book-card .art-image { filter: none; opacity: 1; }
