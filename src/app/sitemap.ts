@@ -7,7 +7,7 @@ export const revalidate = 900;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [articles, books] = await Promise.all([getPublishedArticles(), getActiveBooks()]);
-  const publicPaths = ["", "/news", "/gossips", "/events", "/features", "/books", "/about", "/faq", "/shipping-returns", "/terms", "/privacy", "/contact"];
+  const publicPaths = ["", "/news", "/gossips", "/events", "/features", "/books", "/about", "/faq", "/shipping-returns", "/terms", "/privacy", "/contact", "/sell-with-us"];
   return [
     ...publicPaths.map((path) => ({ url: new URL(path || "/", SITE_URL).toString(), changeFrequency: path === "" ? "daily" as const : "weekly" as const, priority: path === "" ? 1 : .7 })),
     ...articles.map((article) => ({ url: new URL(`/stories/${article.slug}`, SITE_URL).toString(), changeFrequency: "monthly" as const, priority: .8, images: article.image.startsWith("http") ? [article.image] : undefined })),

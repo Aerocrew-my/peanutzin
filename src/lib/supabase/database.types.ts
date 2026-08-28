@@ -46,6 +46,10 @@ export type Database = {
           active: boolean;
           stock_quantity: number | null;
           isbn: string | null;
+          publisher:string|null; publication_year:number|null; language:string|null; genre:string|null;
+          format:"physical"|"ebook"|"both"; ebook_price_cents:number|null;
+          catalogue_type:"peanutzin"|"indie_author"|"independent_publisher";
+          independent_publisher:boolean; emerging_author:boolean; preview_only:boolean;
           created_at: string;
           updated_at: string;
         };
@@ -83,7 +87,7 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["orders"]["Row"]>; Relationships: [];
       };
       order_items: {
-        Row: { id:string; order_id:string; book_id:string|null; book_title:string; book_author:string|null; book_slug:string|null; unit_price_cents:number; quantity:number; line_total_cents:number; created_at:string };
+        Row: { id:string; order_id:string; book_id:string|null; book_title:string; book_author:string|null; book_slug:string|null; unit_price_cents:number; quantity:number; line_total_cents:number; format:"physical"|"ebook"; created_at:string };
         Insert: Omit<Database["public"]["Tables"]["order_items"]["Row"],"id"|"created_at"> & {id?:string;created_at?:string}; Update: Partial<Database["public"]["Tables"]["order_items"]["Insert"]>; Relationships: [];
       };
     };

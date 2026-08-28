@@ -1,6 +1,7 @@
 export type OrderStatus = "pending" | "processing" | "shipped" | "completed" | "cancelled";
 export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed" | "refunded";
-export type CartItem = { bookId: string; slug: string; quantity: number };
+export type BookFormat = "physical" | "ebook";
+export type CartItem = { bookId: string; slug: string; format: BookFormat; quantity: number };
 export type ShippingAddress = { line1: string; line2?: string; postcode: string; city: string; state: MalaysianState; country: "MY" };
 export type CheckoutInput = { customerName: string; customerEmail: string; customerPhone: string; shipping: ShippingAddress; customerNotes?: string; items: CartItem[] };
 export type OrderItem = { id: string; bookId: string | null; bookTitle: string; bookAuthor: string | null; bookSlug: string | null; unitPriceCents: number; quantity: number; lineTotalCents: number };

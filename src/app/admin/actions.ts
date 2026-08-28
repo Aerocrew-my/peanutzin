@@ -70,13 +70,18 @@ export async function deleteArticle(form: FormData) { await requireAdmin(); cons
 export async function saveBook(_state: ActionState, form: FormData): Promise<ActionState> {
   await requireAdmin();
   const id = nullable(form,"id"), title = text(form,"title"), author = text(form,"author"), slug = text(form,"slug").toLowerCase(), price = text(form,"price");
-  const stockText = text(form,"stock_quantity"), stock = stockText ? Number(stockText) : null;
+  const stockText = text(form,"stock_quantity"), stock = stockText ? Number(stockText) : null, format=text(form,"format"), ebookPrice=text(form,"ebook_price"),yearText=text(form,"publication_year"),year=yearText?Number(yearText):null;
   if (!title || !author || !slugPattern.test(slug)) return { error: "Title, author, and a valid lowercase slug are required." };
   if (!/^\d+(?:\.\d{1,2})?$/.test(price)) return { error: "Price must be non-negative with at most two decimal places." };
   if (stock !== null && (!Number.isInteger(stock) || stock < 0)) return { error: "Stock must be a non-negative whole number." };
+  if(!["physical","ebook","both"].includes(format))return{error:"Choose a valid format."};
+  if(format!=="physical"&&!/^\d+(?:\.\d{1,2})?$/.test(ebookPrice))return{error:"Add a valid eBook price."};
+  if(year!==null&&(!Number.isInteger(year)||year<1000||year>2100))return{error:"Add a valid publication year."};
   try {
     const newImage = await upload(form,"image","book-covers",`books/${slug}`);
-    const values = { title, author, slug, description: nullable(form,"description"), price_cents: Math.round(Number(price) * 100), currency: "MYR" as const, cover_image_path: newImage ?? nullable(form,"existing_image"), featured: form.get("featured") === "on", active: form.get("active") === "on", stock_quantity: stock, isbn: nullable(form,"isbn") };
+    const catalogueType=text(form,"catalogue_type") as "peanutzin"|"indie_author"|"independent_publisher";
+    if(!["peanutzin","indie_author","independent_publisher"].includes(catalogueType))return{error:"Choose a catalogue type."};
+    const values = { title, author, slug, description: nullable(form,"description"), price_cents: Math.round(Number(price) * 100), currency: "MYR" as const, cover_image_path: newImage ?? nullable(form,"existing_image"), featured: form.get("featured") === "on", active: form.get("active") === "on", stock_quantity: format==="ebook"?null:stock, isbn: nullable(form,"isbn"),publisher:nullable(form,"publisher"),publication_year:year,language:nullable(form,"language"),genre:nullable(form,"genre"),format:format as "physical"|"ebook"|"both",ebook_price_cents:format==="physical"?null:Math.round(Number(ebookPrice)*100),catalogue_type:catalogueType,independent_publisher:form.get("independent_publisher")==="on",emerging_author:form.get("emerging_author")==="on",preview_only:form.get("preview_only")==="on" };
     const supabase = await createClient();
     const result = id ? await supabase.from("books").update(values).eq("id",id).select("id").single() : await supabase.from("books").insert(values).select("id").single();
     if (result.error) return { error: friendly(result.error.message) };

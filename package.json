@@ -13,7 +13,8 @@
     "test:social:live": "node tests/live-social-studio.mjs",
     "sync:editorial-images": "node scripts/sync-editorial-images.mjs",
     "test:publishing:live": "node tests/live-social-publishing.mjs",
-    "test:images:live": "node tests/live-editorial-images.mjs"
+    "test:images:live": "node tests/live-editorial-images.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

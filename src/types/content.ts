@@ -33,4 +33,15 @@ export interface Book {
   description?: string;
   featured?: boolean;
   stockQuantity?: number | null;
+  publisher?: string;
+  isbn?: string;
+  publicationYear?: number;
+  language?: string;
+  genre?: string;
+  format?: "physical" | "ebook" | "both";
+  ebookPriceCents?: number | null;
+  catalogueType?: "peanutzin" | "indie_author" | "independent_publisher";
+  independentPublisher?: boolean;
+  emergingAuthor?: boolean;
+  previewOnly?: boolean;
 }

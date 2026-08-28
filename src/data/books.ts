@@ -8,7 +8,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 
 type BookRow = Database["public"]["Tables"]["books"]["Row"];
-function mapBook(row: BookRow): Book { return { id: row.id, slug: row.slug, title: row.title, author: row.author, priceCents: row.price_cents, currency: row.currency, cover: publicMediaUrl("book-covers", row.cover_image_path) ?? "coral", description: row.description ?? undefined, featured: row.featured, stockQuantity: row.stock_quantity }; }
+function mapBook(row: BookRow): Book { return { id: row.id, slug: row.slug, title: row.title, author: row.author, priceCents: row.price_cents, currency: row.currency, cover: publicMediaUrl("book-covers", row.cover_image_path) ?? "coral", description: row.description ?? undefined, featured: row.featured, stockQuantity: row.stock_quantity, publisher:row.publisher??undefined,isbn:row.isbn??undefined,publicationYear:row.publication_year??undefined,language:row.language??undefined,genre:row.genre??undefined,format:row.format,ebookPriceCents:row.ebook_price_cents,catalogueType:row.catalogue_type,independentPublisher:row.independent_publisher,emergingAuthor:row.emerging_author,previewOnly:row.preview_only }; }
 async function queryBooks(query: (client: ReturnType<typeof createPublicClient>) => PromiseLike<{ data: BookRow[] | null; error: { message: string } | null }>) {
   if (shouldUseDevelopmentFallback()) return fallbackBooks;
   requireConfiguredDataSource();
