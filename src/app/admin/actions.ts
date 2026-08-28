@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/admin/auth";
@@ -62,10 +62,10 @@ export async function saveArticle(_state: ActionState, form: FormData): Promise<
     const oldImage = nullable(form, "existing_image");
     if (newImage && oldImage?.includes("/")) await supabase.storage.from("article-media").remove([oldImage]);
   } catch (error) { return { error: error instanceof Error ? error.message : "Unable to save article." }; }
-  revalidatePath("/", "layout"); redirect(`/admin/articles?saved=${status}`);
+  revalidateTag("articles", "max"); revalidatePath("/", "layout"); redirect(`/admin/articles?saved=${status}`);
 }
 
-export async function deleteArticle(form: FormData) { await requireAdmin(); const id = text(form,"id"); if (id) { const { error } = await (await createClient()).from("articles").delete().eq("id",id); if (error) throw new Error("Unable to delete article."); } revalidatePath("/", "layout"); redirect("/admin/articles?deleted=1"); }
+export async function deleteArticle(form: FormData) { await requireAdmin(); const id = text(form,"id"); if (id) { const { error } = await (await createClient()).from("articles").delete().eq("id",id); if (error) throw new Error("Unable to delete article."); } revalidateTag("articles", "max"); revalidatePath("/", "layout"); redirect("/admin/articles?deleted=1"); }
 
 export async function saveBook(_state: ActionState, form: FormData): Promise<ActionState> {
   await requireAdmin();
@@ -83,17 +83,17 @@ export async function saveBook(_state: ActionState, form: FormData): Promise<Act
     const oldImage = nullable(form, "existing_image");
     if (newImage && oldImage?.includes("/")) await supabase.storage.from("book-covers").remove([oldImage]);
   } catch (error) { return { error: error instanceof Error ? error.message : "Unable to save book." }; }
-  revalidatePath("/", "layout"); redirect("/admin/books?saved=1");
+  revalidateTag("books", "max"); revalidatePath("/", "layout"); redirect("/admin/books?saved=1");
 }
 
-export async function deleteBook(form: FormData) { await requireAdmin(); const id=text(form,"id"); if(id){const {error}=await(await createClient()).from("books").delete().eq("id",id);if(error)throw new Error("Unable to delete book.");} revalidatePath("/", "layout"); redirect("/admin/books?deleted=1"); }
+export async function deleteBook(form: FormData) { await requireAdmin(); const id=text(form,"id"); if(id){const {error}=await(await createClient()).from("books").delete().eq("id",id);if(error)throw new Error("Unable to delete book.");} revalidateTag("books", "max"); revalidatePath("/", "layout"); redirect("/admin/books?deleted=1"); }
 
 export async function saveSettings(_state: ActionState, form: FormData): Promise<ActionState> {
   await requireAdmin(); const supabase=await createClient();
   const rows = [
     {key:"announcement",value:text(form,"announcement")}, {key:"newsletterHeading",value:text(form,"newsletterHeading")}, {key:"newsletterCopy",value:text(form,"newsletterCopy")},
-    {key:"contact",value:{email:text(form,"contact_email"),phone:text(form,"contact_phone")}}, {key:"social",value:{instagram:text(form,"instagram"),tiktok:text(form,"tiktok"),facebook:text(form,"facebook")}},
+    {key:"contact",value:{email:text(form,"contact_email"),phone:text(form,"contact_phone")}}, {key:"social",value:{instagram:text(form,"instagram"),facebook:text(form,"facebook")}},
   ];
   const {error}=await supabase.from("site_settings").upsert(rows,{onConflict:"key"}); if(error)return{error:"Settings could not be saved."};
-  revalidatePath("/", "layout"); redirect("/admin/settings?saved=1");
+  revalidateTag("site-settings", "max"); revalidatePath("/", "layout"); redirect("/admin/settings?saved=1");
 }

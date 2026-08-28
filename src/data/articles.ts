@@ -1,10 +1,11 @@
 import type { Article, ArticleCategory } from "@/types/content";
 import { articles as fallbackArticles } from "./mock-data";
 import { shouldUseDevelopmentFallback, requireConfiguredDataSource } from "./shared";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/lib/supabase/database.types";
 import { publicMediaUrl } from "@/lib/supabase/media";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 type ArticleRow = Database["public"]["Tables"]["articles"]["Row"];
 
@@ -22,43 +23,54 @@ function mapArticle(row: ArticleRow): Article {
   };
 }
 
-async function queryArticles(query: (client: Awaited<ReturnType<typeof createClient>>) => PromiseLike<{ data: ArticleRow[] | null; error: { message: string } | null }>) {
+async function queryArticles(query: (client: ReturnType<typeof createPublicClient>) => PromiseLike<{ data: ArticleRow[] | null; error: { message: string } | null }>) {
   requireConfiguredDataSource();
-  const result = await query(await createClient());
+  const result = await query(createPublicClient());
   if (result.error) throw new Error(`Unable to load articles: ${result.error.message}`);
   return (result.data ?? []).map(mapArticle);
 }
 
+const queryPublishedArticles = unstable_cache(
+  () => queryArticles((client) => client.from("articles").select("*").eq("status", "published").order("published_at", { ascending: false })),
+  ["published-articles"], { revalidate: 900, tags: ["articles"] },
+);
+
 export function getPublishedArticles() {
   if (shouldUseDevelopmentFallback()) return Promise.resolve(fallbackArticles);
-  return queryArticles((client) => client.from("articles").select("*").eq("status", "published").order("published_at", { ascending: false }));
+  return queryPublishedArticles();
 }
+
+const queryCategoryArticles = unstable_cache(async (category: ArticleCategory) => {
+  if (category === "event") {
+    return queryArticles((client) => client.from("articles").select("*").eq("status", "published").eq("category", "event").gte("event_end_at", new Date().toISOString()).order("event_start_at", { ascending: true }));
+  }
+  return queryArticles((client) => client.from("articles").select("*").eq("status", "published").eq("category", category).order("published_at", { ascending: false }));
+}, ["published-articles-by-category"], { revalidate: 900, tags: ["articles"] });
 
 export function getArticlesByCategory(category: ArticleCategory) {
   if (shouldUseDevelopmentFallback()) {
     const items = fallbackArticles.filter((article) => article.category === category);
     return Promise.resolve(category === "event" ? items.filter((article) => article.eventEndAt && new Date(article.eventEndAt) >= new Date()).sort((a,b) => new Date(a.eventStartAt??0).valueOf()-new Date(b.eventStartAt??0).valueOf()) : items);
   }
-  if (category === "event") {
-    return queryArticles((client) => client.from("articles").select("*").eq("status", "published").eq("category", "event").gte("event_end_at", new Date().toISOString()).order("event_start_at", { ascending: true }));
-  }
-  return queryArticles((client) => client.from("articles").select("*").eq("status", "published").eq("category", category).order("published_at", { ascending: false }));
+  return queryCategoryArticles(category);
 }
 
 export function getTrendingArticles() {
-  if (shouldUseDevelopmentFallback()) return Promise.resolve(fallbackArticles.filter((article) => article.trendingRank).sort((a,b)=>(a.trendingRank??0)-(b.trendingRank??0)));
-  return queryArticles((client) => client.from("articles").select("*").eq("status", "published").not("trending_rank", "is", null).order("trending_rank", { ascending: true }));
+  return getPublishedArticles().then((items) => items.filter((article) => article.trendingRank).sort((a,b)=>(a.trendingRank??0)-(b.trendingRank??0)));
 }
 
 export function getFeaturedArticles() {
-  if (shouldUseDevelopmentFallback()) return Promise.resolve(fallbackArticles.filter((article) => article.featured));
-  return queryArticles((client) => client.from("articles").select("*").eq("status", "published").eq("featured", true).order("published_at", { ascending: false }));
+  return getPublishedArticles().then((items) => items.filter((article) => article.featured));
 }
+
+const queryArticleBySlug = unstable_cache(async (slug: string) => {
+  const { data, error } = await createPublicClient().from("articles").select("*").eq("status", "published").eq("slug", slug).maybeSingle();
+  if (error) throw new Error(`Unable to load article: ${error.message}`);
+  return data ? mapArticle(data) : null;
+}, ["published-article-by-slug"], { revalidate: 900, tags: ["articles"] });
 
 export const getArticleBySlug = cache(async function getArticleBySlug(slug: string) {
   if (shouldUseDevelopmentFallback()) return fallbackArticles.find((article) => article.slug === slug) ?? null;
   requireConfiguredDataSource();
-  const { data, error } = await (await createClient()).from("articles").select("*").eq("status", "published").eq("slug", slug).maybeSingle();
-  if (error) throw new Error(`Unable to load article: ${error.message}`);
-  return data ? mapArticle(data) : null;
+  return queryArticleBySlug(slug);
 });

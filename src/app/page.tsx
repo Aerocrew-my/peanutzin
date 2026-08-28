@@ -1,12 +1,15 @@
 import { HomePage } from "@/components/site";
-import { getFeaturedArticles, getPublishedArticles, getTrendingArticles } from "@/data/articles";
-import { getFeaturedBooks } from "@/data/books";
+import { getPublishedArticles } from "@/data/articles";
+import { getActiveBooks } from "@/data/books";
 import { getSiteSettings } from "@/data/site-settings";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 export default async function Home() {
-	const [published, featured, trending, books, settings] = await Promise.all([getPublishedArticles(), getFeaturedArticles(), getTrendingArticles(), getFeaturedBooks(), getSiteSettings()]);
+	const [published, activeBooks, settings] = await Promise.all([getPublishedArticles(), getActiveBooks(), getSiteSettings()]);
+	const featured = published.filter((article) => article.featured);
+	const trending = published.filter((article) => article.trendingRank).sort((a, b) => (a.trendingRank ?? 0) - (b.trendingRank ?? 0));
+	const books = activeBooks.filter((book) => book.featured);
 	const articles = [...featured, ...published.filter((article) => !featured.some((item) => item.id === article.id))];
 	return <HomePage articles={articles.length ? articles : trending} books={books} announcement={typeof settings.announcement === "string" ? settings.announcement : undefined} />;
 }

@@ -3,7 +3,7 @@ import { getArticleBySlug } from "@/data/articles";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/seo";
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params, article = await getArticleBySlug(slug);
